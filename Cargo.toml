@@ -1,0 +1,7 @@
+[package]
+name = "rtree"
+version = "0.1.0"
+authors = ["natsuki <yukihiratype2@live.com>"]
+edition = "2018"
+
+[dependencies]

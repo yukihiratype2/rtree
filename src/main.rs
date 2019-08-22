@@ -22,11 +22,7 @@ enum Entry {
 
 type Entries = Vec<Entry>;
 
-
-fn main() {
-    let tree = generate_entry_tree(path::Path::new("./")).expect("bala");
-    print_tree(&tree, 1);
-}
+type LayerIsLast = Vec<bool>;
 
 fn generate_entry_tree(path: &path::Path) -> std::io::Result<Entries> {
     let mut entries: Entries = vec![];
@@ -50,21 +46,62 @@ fn generate_entry_tree(path: &path::Path) -> std::io::Result<Entries> {
     Ok(entries)
 }
 
-fn print_tree(entries: &Entries, layer: usize) {
-    for (i, entry) in entries.iter().enumerate() {
-        if i == entries.len() - 1 {
-            print!("{:│>1$} {}", "└", layer);
-        } else {
-            print!("{:│>1$} {}", "├", layer);
-        }
+fn print_tree(entries: &[Entry], layer_is_last: LayerIsLast) {
+    let last_entry = &entries.last().unwrap();
+    let entries = &entries[..entries.len() - 1];
+    for entry in entries {
+        print_tree_line(entry, &layer_is_last);
         match entry {
-            Entry::Dir(v) => {
-                println!("dir {}", v.path.display());
-                print_tree(&v.entries, layer + 1);
+            Entry::Dir(dir) => {
+                if dir.entries.len() > 0 {
+                    let mut sub_layer = layer_is_last.clone();
+                    sub_layer.push(false);
+                    print_tree(&dir.entries[..], sub_layer);
+                }
             },
-            Entry::File(v) => {
-                println!("file {:?}", v.path.display())
-            }
+            Entry::File(_) => {},
         }
     }
+
+    print_tree_line_last(last_entry, &layer_is_last);
+    match last_entry {
+        Entry::Dir(dir) => {
+            if dir.entries.len() > 0 {
+                let mut sub_layer = layer_is_last.clone();
+                sub_layer.push(true);
+                print_tree(&dir.entries[..], sub_layer);
+            }
+        },
+        Entry::File(_) => {},
+    }
+}
+
+fn print_tree_line(entry: &Entry, layer_is_last: &LayerIsLast) {
+    for layer in layer_is_last {
+        match layer {
+            true => print!("     "),
+            false => print!("│    "),
+        }
+    }
+    match entry {
+        Entry::Dir(dir) => println!("├─── {}",dir.path.file_name().unwrap().to_str().unwrap()),
+        Entry::File(file) => println!("├─── {}",  file.path.file_name().unwrap().to_str().unwrap()),
+    }
+}
+fn print_tree_line_last(entry: &Entry, layer_is_last: &LayerIsLast) {
+    for layer in layer_is_last {
+        match layer {
+            true => print!("     "),
+            false => print!("│    "),
+        }
+    }
+    match entry {
+        Entry::Dir(dir) => println!("└─── {}",  dir.path.file_name().unwrap().to_str().unwrap()),
+        Entry::File(file) => println!("└─── {}", file.path.file_name().unwrap().to_str().unwrap()),
+    }
+}
+
+fn main() {
+    let tree = generate_entry_tree(path::Path::new("./")).expect("bala");
+    print_tree(&tree[..], vec![]);
 }

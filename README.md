@@ -1,2 +1,2 @@
 # rtree
-rust version of tree command
+tree command with color enabled by default

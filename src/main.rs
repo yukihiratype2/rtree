@@ -1,5 +1,6 @@
 use std::path;
 use std::fs;
+use colored::*;
 
 #[derive(Debug)]
 struct Dir {
@@ -84,8 +85,8 @@ fn print_tree_line(entry: &Entry, layer_is_last: &LayerIsLast) {
         }
     }
     match entry {
-        Entry::Dir(dir) => println!("├─── {}",dir.path.file_name().unwrap().to_str().unwrap()),
-        Entry::File(file) => println!("├─── {}",  file.path.file_name().unwrap().to_str().unwrap()),
+        Entry::Dir(dir) => println!("├─── {}",dir.path.file_name().unwrap().to_str().unwrap().green()),
+        Entry::File(file) => println!("├─── {}",  file.path.file_name().unwrap().to_str().unwrap().blue()),
     }
 }
 fn print_tree_line_last(entry: &Entry, layer_is_last: &LayerIsLast) {
@@ -96,8 +97,8 @@ fn print_tree_line_last(entry: &Entry, layer_is_last: &LayerIsLast) {
         }
     }
     match entry {
-        Entry::Dir(dir) => println!("└─── {}",  dir.path.file_name().unwrap().to_str().unwrap()),
-        Entry::File(file) => println!("└─── {}", file.path.file_name().unwrap().to_str().unwrap()),
+        Entry::Dir(dir) => println!("└─── {}",  dir.path.file_name().unwrap().to_str().unwrap().green()),
+        Entry::File(file) => println!("└─── {}", file.path.file_name().unwrap().to_str().unwrap().blue()),
     }
 }
 
